@@ -111,7 +111,7 @@ def kMeans():
 
     # then perform k-means clustering wit h number of clusters defined as 3
     # also random centres are initially choosed for k-means clustering
-    k = 3
+    k = 4
     retval, labels, centers = cv2.kmeans(pixel_vals, k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
 
     # convert data into 8-bit values
@@ -156,6 +156,7 @@ def Wmiaredziala():
 
     # Read image
     img = cv2.imread("/Users/Eryk/Desktop/deski/2_proba\DSCF6344.JPG")
+    #img = cv2.imread("/Users/Eryk/Desktop/deski2\DSCF6409.JPG")
 
 
 
@@ -183,7 +184,7 @@ def Wmiaredziala():
 
     #(thresh, binary) =cv2.threshold(img_to_gray,80,255,cv2.THRESH_BINARY)  #simple threshold
     #(thresh, binary) =cv2.threshold(img_to_gray,0,255,cv2.THRESH_OTSU)     #otsu1
-    binary =cv2.adaptiveThreshold(img_to_gray,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY, 195, 50)     #adaptive1
+    binary =cv2.adaptiveThreshold(img_to_gray,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY, 199, 50)     #adaptive1
     #binary =cv2.adaptiveThreshold(img_to_gray,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY, 195, 40)     #adaptive1
     #(thresh, binary) =cv2.threshold(img_to_gray,120,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)  #otsu2
 
@@ -194,69 +195,112 @@ def Wmiaredziala():
     cv2.destroyAllWindows() # Close windows
 
 
-    # apply morphology
-    kernel = np.ones((3, 3), np.uint8)
-    morph = cv2.morphologyEx(binary, cv2.MORPH_GRADIENT, kernel)
+    # apply morphology open
 
 
-    cv2.imshow("morph", morph)
+    # defining the kernel matrix
+    kernel = np.ones((4, 4), np.uint8)
+    # using morphologyEx function by specifying the MORPH_OPEN operation on the input image
+    openimage = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+
+
+    cv2.imshow("morph-open", openimage)
     cv2.waitKey(0)  # Wait for keypress to continue
     cv2.destroyAllWindows()  # Close windows
+
+    # apply morphology close
+
+    # using morphologyEx function by specifying the MORPH_CLOSE operation on the input image
+    closingimage = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
+    # displaying the morphed image as the output on the screen
+    cv2.imshow('morph-close', closingimage)
+    cv2.waitKey(0)
 
 
     # To detect object contours, we want a black background and a white object
 
-    inverted_binary = ~binary
+    inverted_binary = ~closingimage
     cv2.imshow('Inverted binary image', inverted_binary)
     cv2.waitKey(0) # Wait for keypress to continue
     cv2.destroyAllWindows() # Close windows
 
-    # Find contours
-
-    contours, hierarchy = cv2.findContours(inverted_binary,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-
-    # Draw contours on original
-
-    with_contours = cv2.drawContours(img_res, contours, -1,(255,0,255),2)
-    cv2.imshow('Detected contours', with_contours)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-
-
-
-    # Show the total number of contours that were detected
-    print('Total number of contours detected: ' + str(len(contours)))
-
-    # Draw just the first contour
-    # The 0 means to draw the first contour
-    first_contour = cv2.drawContours(new_image, contours, 0, (255, 0, 255), 3)
-    cv2.imshow('First detected contour', first_contour)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    # Draw a bounding box around the first contour
-    # x is the starting x coordinate of the bounding box
-    # y is the starting y coordinate of the bounding box
-    # w is the width of the bounding box
-    # h is the height of the bounding box
-    x, y, w, h = cv2.boundingRect(contours[0])
-    cv2.rectangle(first_contour, (x, y), (x + w, y + h), (255, 0, 0), 1)
-    cv2.imshow('First contour with bounding box', first_contour)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    # Draw a bounding box around all contours
-    for c in contours:
-        x, y, w, h = cv2.boundingRect(c)
-
-        # Make sure contour area is large enough
-        if (cv2.contourArea(c)) > 5:
-            cv2.rectangle(with_contours, (x, y), (x + w, y + h), (255, 0, 0), 1)
-
-    cv2.imshow('All contours with bounding box', with_contours)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # # Apply the Component analysis function
+    # analysis = cv2.connectedComponentsWithStats(inverted_binary,
+    #                                             4,
+    #                                             cv2.CV_32S)
+    # (totalLabels, label_ids, values, centroid) = analysis
+    #
+    # # Initialize a new image to
+    # # store all the output components
+    # output = np.zeros(img_to_gray.shape, dtype="uint8")
+    #
+    # # Loop through each component
+    # for i in range(1, totalLabels):
+    #     area = values[i, cv2.CC_STAT_AREA]
+    #
+    #
+    #     componentMask = (label_ids == i).astype("uint8") * 255
+    #
+    # # Creating the Final output mask
+    # output = cv2.bitwise_or(output, componentMask)
+    #
+    # cv2.imshow("Filtered Components", output)
+    # cv2.waitKey(0)
+    #
+    #
+    # #substract
+    #
+    # substract_img = cv2.subtract(inverted_binary, output)
+    #
+    # cv2.imshow("Substract Components", substract_img)
+    # cv2.waitKey(0)
+    #
+    # # Find contours
+    #
+    # contours, hierarchy = cv2.findContours(substract_img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    #
+    # # Draw contours on original
+    #
+    # with_contours = cv2.drawContours(img_res, contours, -1,(255,0,255),2)
+    # cv2.imshow('Detected contours', with_contours)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+    #
+    #
+    #
+    #
+    # # Show the total number of contours that were detected
+    # print('Total number of contours detected: ' + str(len(contours)))
+    #
+    # # Draw just the first contour
+    # # The 0 means to draw the first contour
+    # first_contour = cv2.drawContours(new_image, contours, 0, (255, 0, 255), 3)
+    # cv2.imshow('First detected contour', first_contour)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+    #
+    # # Draw a bounding box around the first contour
+    # # x is the starting x coordinate of the bounding box
+    # # y is the starting y coordinate of the bounding box
+    # # w is the width of the bounding box
+    # # h is the height of the bounding box
+    # x, y, w, h = cv2.boundingRect(contours[0])
+    # cv2.rectangle(first_contour, (x, y), (x + w, y + h), (255, 0, 0), 1)
+    # cv2.imshow('First contour with bounding box', first_contour)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+    #
+    # # Draw a bounding box around all contours
+    # for c in contours:
+    #     x, y, w, h = cv2.boundingRect(c)
+    #
+    #     # Make sure contour area is large enough
+    #     if (cv2.contourArea(c)) > 5:
+    #         cv2.rectangle(with_contours, (x, y), (x + w, y + h), (255, 0, 0), 1)
+    #
+    # cv2.imshow('All contours with bounding box', with_contours)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
 
 
