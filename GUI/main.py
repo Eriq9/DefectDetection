@@ -1,15 +1,10 @@
 from tkinter import *
-
-# loading Python Imaging Library
 from PIL import ImageTk, Image
-
-# To get the dialog box to open when required
 from tkinter import filedialog
-
-
-
 import glob
 import random
+
+from Backend.test import ImageProcessingAlgorithms
 
 
 
@@ -75,17 +70,23 @@ def load_random_image():
     random_img = ImageTk.PhotoImage(random_img)
     # stworzenie labelki ze zdjęcia
     panel = Label(root, image=random_img)
-    panel2 = Label(root, image=random_img)
     # dodanie do aplikacji
     panel.image = random_img
     panel.place(x=100, y=375)
-    panel2.place(x=800, y=375)
+
+def Results():
+    algorithm = ImageProcessingAlgorithms(open_random_photo())
+    Result = algorithm.ImageProcess()
+
+    return Result
 
 
 # Buttony
 Otworz_zdjecie_btn = Button(root, text='Otwórz zdjęcie', command=load_image).place(x=200,y=123)               #Button do wyboru zdjęcia
 Losowe_zdjecie_btn = Button(root, text='Wylosuj zdjęcie', command=load_random_image).place(x=200,y=173)       #Button do losowego zdjęcia
-Przetworz_btn = Button(root, text='Detekcja', command=load_random_image).place(x=200,y=223)       #Button do losowego zdjęcia
+Przetworz_btn = Button(root, text='Detekcja', command=Results).place(x=200,y=223)                    #Button do losowego zdjęcia
 
 
 root.mainloop()
+
+#open_random_photo()

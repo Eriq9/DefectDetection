@@ -4,6 +4,7 @@ import numpy as np
 import skimage
 import matplotlib.pyplot as plt
 import cv2
+import argparse
 
 from skimage import io
 from skimage import color
@@ -11,48 +12,13 @@ from matplotlib import pyplot as plt
 from skimage import data
 from skimage.color import rgb2hsv
 
-
 import numpy as np
-import glob
-
 import skimage.io
 import skimage.color
 import skimage.filters
 
 
-
-
-# # way to load car image from file
-# filepath = "/Users/Eryk/Desktop/deski/2_proba\DSCF6344.JPG"
-#
-# photo = io.imread(filepath)
-#
-# # way to show the input image
-# #io.imshow(photo)
-# img = color.rgb2gray(photo)
-# io.imshow(img)
-# #io.imsave("skimage-greyscale.png",img)
-# io.show()
-
-# Converting RGB Image to HSV Image
-# hsv_coffee = rgb2hsv(cars)
-# io.imshow(hsv_coffee)
-# io.show()
-
-#img2 = cv2.imread('/Users/Eryk/Desktop/deski/2_proba\DSCF6344.JPG', 0)
-
-# find frequency of pixels in range 0-255
-# histr = cv2.calcHist([img], [0], None, [256], [0, 256])
-
-# show the plotting graph of an image
-# plt.plot(histr)
-# plt.show()
-#
-# plt.hist(img.ravel(),256,[0,256])
-# plt.show()
-
-
-def slabo():
+def histogram():
 
     filepath = "/Users/Eryk/Desktop/deski/2_proba\DSCF6344.JPG"
 
@@ -127,28 +93,6 @@ def kMeans():
 
 #kMeans()
 
-def lalal():
-
-    imgE = cv2.imread("/Users/Eryk/Desktop/deski/2_proba\DSCF6344.JPG", 0)
-    h,w = imgE.shape[:12]
-
-
-    new_h, new_w = int(h / 4), int(w / 4)
-    resizeImg = cv2.resize(imgE, (new_w, new_h))
-
-    (thresh, binary_image) = cv2.threshold(imgE, 100, 255, cv2.THRESH_BINARY)
-
-    resizeImg2 = cv2.resize(binary_image, (new_w, new_h))
-
-    #cv2.imshow('Original', imgE)
-    cv2.imshow('Resizing', resizeImg)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    cv2.imshow('Resizing', resizeImg2)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-
 def Wmiaredziala():
 
     # Read image as grayscale
@@ -184,7 +128,7 @@ def Wmiaredziala():
 
     #(thresh, binary) =cv2.threshold(img_to_gray,80,255,cv2.THRESH_BINARY)  #simple threshold
     #(thresh, binary) =cv2.threshold(img_to_gray,0,255,cv2.THRESH_OTSU)     #otsu1
-    binary =cv2.adaptiveThreshold(img_to_gray,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY, 199, 50)     #adaptive1
+    binary =cv2.adaptiveThreshold(img_to_gray,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY, 199, 45)     #adaptive1
     #binary =cv2.adaptiveThreshold(img_to_gray,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY, 195, 40)     #adaptive1
     #(thresh, binary) =cv2.threshold(img_to_gray,120,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)  #otsu2
 
@@ -211,7 +155,7 @@ def Wmiaredziala():
     # apply morphology close
 
     # using morphologyEx function by specifying the MORPH_CLOSE operation on the input image
-    closingimage = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
+    closingimage = cv2.morphologyEx(openimage, cv2.MORPH_CLOSE, kernel)
     # displaying the morphed image as the output on the screen
     cv2.imshow('morph-close', closingimage)
     cv2.waitKey(0)
@@ -224,102 +168,173 @@ def Wmiaredziala():
     cv2.waitKey(0) # Wait for keypress to continue
     cv2.destroyAllWindows() # Close windows
 
-    # # Apply the Component analysis function
-    # analysis = cv2.connectedComponentsWithStats(inverted_binary,
-    #                                             4,
-    #                                             cv2.CV_32S)
-    # (totalLabels, label_ids, values, centroid) = analysis
-    #
-    # # Initialize a new image to
-    # # store all the output components
-    # output = np.zeros(img_to_gray.shape, dtype="uint8")
-    #
-    # # Loop through each component
-    # for i in range(1, totalLabels):
-    #     area = values[i, cv2.CC_STAT_AREA]
-    #
-    #
-    #     componentMask = (label_ids == i).astype("uint8") * 255
-    #
-    # # Creating the Final output mask
-    # output = cv2.bitwise_or(output, componentMask)
-    #
-    # cv2.imshow("Filtered Components", output)
-    # cv2.waitKey(0)
-    #
-    #
-    # #substract
-    #
-    # substract_img = cv2.subtract(inverted_binary, output)
-    #
-    # cv2.imshow("Substract Components", substract_img)
-    # cv2.waitKey(0)
-    #
-    # # Find contours
-    #
-    # contours, hierarchy = cv2.findContours(substract_img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    #
-    # # Draw contours on original
-    #
-    # with_contours = cv2.drawContours(img_res, contours, -1,(255,0,255),2)
-    # cv2.imshow('Detected contours', with_contours)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
-    #
-    #
-    #
-    #
-    # # Show the total number of contours that were detected
-    # print('Total number of contours detected: ' + str(len(contours)))
-    #
-    # # Draw just the first contour
-    # # The 0 means to draw the first contour
-    # first_contour = cv2.drawContours(new_image, contours, 0, (255, 0, 255), 3)
-    # cv2.imshow('First detected contour', first_contour)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
-    #
-    # # Draw a bounding box around the first contour
-    # # x is the starting x coordinate of the bounding box
-    # # y is the starting y coordinate of the bounding box
-    # # w is the width of the bounding box
-    # # h is the height of the bounding box
-    # x, y, w, h = cv2.boundingRect(contours[0])
-    # cv2.rectangle(first_contour, (x, y), (x + w, y + h), (255, 0, 0), 1)
-    # cv2.imshow('First contour with bounding box', first_contour)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
-    #
-    # # Draw a bounding box around all contours
-    # for c in contours:
-    #     x, y, w, h = cv2.boundingRect(c)
-    #
-    #     # Make sure contour area is large enough
-    #     if (cv2.contourArea(c)) > 5:
-    #         cv2.rectangle(with_contours, (x, y), (x + w, y + h), (255, 0, 0), 1)
-    #
-    # cv2.imshow('All contours with bounding box', with_contours)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+
+    # Apply the Component analysis function
+    analysis = cv2.connectedComponentsWithStats(inverted_binary,
+                                                4,
+                                                cv2.CV_32S)
+    (totalLabels, label_ids, values, centroid) = analysis
+
+    # Initialize a new image to
+    # store all the output components
+    output = np.zeros(img_to_gray.shape, dtype="uint8")
+
+    # Loop through each component
+    for i in range(1, totalLabels):
+        area = values[i, cv2.CC_STAT_AREA]
+
+
+        componentMask = (label_ids == i).astype("uint8") * 255
+        print(componentMask)
+        print(area)
+
+    # Creating the Final output mask
+    output = cv2.bitwise_or(output, componentMask)
+
+    cv2.imshow("Filtered Components", output)
+    cv2.waitKey(0)
+
+
+    #substract
+
+    substract_img = cv2.subtract(inverted_binary, output)
+
+    cv2.imshow("Substract Components", substract_img)
+    cv2.waitKey(0)
+
+    # Find contours
+
+    contours, hierarchy = cv2.findContours(substract_img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+
+    # Draw contours on original
+
+    with_contours = cv2.drawContours(img_res, contours, -1,(255,0,255),2)
+    cv2.imshow('Detected contours', with_contours)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 
 
-#img33= cv2.resize(img3, (800,600))
-#(thresh, binary33) =cv2.threshold(img33,120,255,cv2.THRESH_BINARY)
+    # Show the total number of contours that were detected
+    print('Total number of contours detected: ' + str(len(contours)))
 
-# contours, hierarchy = cv2.findContours(binary33, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-#
-# imageNew = cv2.drawContours(binary33, contours, -1, (0,255,0),2)
+    # Draw just the first contour
+    # The 0 means to draw the first contour
+    first_contour = cv2.drawContours(new_image, contours, 0, (255, 0, 255), 3)
+    cv2.imshow('First detected contour', first_contour)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    # Draw a bounding box around the first contour
+    # x is the starting x coordinate of the bounding box
+    # y is the starting y coordinate of the bounding box
+    # w is the width of the bounding box
+    # h is the height of the bounding box
+    x, y, w, h = cv2.boundingRect(contours[0])
+    cv2.rectangle(first_contour, (x, y), (x + w, y + h), (255, 0, 0), 1)
+    cv2.imshow('First contour with bounding box', first_contour)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    # Draw a bounding box around all contours
+    for c in contours:
+        x, y, w, h = cv2.boundingRect(c)
+
+        # Make sure contour area is large enough
+        if (cv2.contourArea(c)) > 5:
+            cv2.rectangle(with_contours, (x, y), (x + w, y + h), (255, 0, 0), 1)
+
+    cv2.imshow('All contours with bounding box', with_contours)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
-# plt.imshow(imageNew)
-# plt.show()
+#Wmiaredziala()
+
+class ImageProcessingAlgorithms:
+    def __init__(self, ImagePath):
+        self.random_image_path = ImagePath
 
 
-#cv2.imshow('Resizing', binary33)
-#cv2.waitKey(0)
-#cv2.destroyAllWindows()
-#print("Shape of the loaded image is", img33.shape)
+    def ImageProcess(ImagePath):
+        # Read image
+        img = cv2.imread(ImagePath)
+        #img = cv2.imread("/Users/Eryk/Desktop/deski/2_proba\DSCF6344.JPG")
 
-Wmiaredziala()
+        # Resize image
+
+        img_res = cv2.resize(img, (800, 600))
+
+        # Make a copy
+        new_image = img_res.copy()
+
+        # Convert to grayscale
+
+        img_to_gray = cv2.cvtColor(img_res, cv2.COLOR_BGR2GRAY)
+
+        # Convert to binary
+
+        binary = cv2.adaptiveThreshold(img_to_gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 199, 45)  # adaptive1
+
+        # apply morphology open
+        # defining the kernel matrix
+
+        kernel = np.ones((4, 4), np.uint8)
+        openimage = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+
+        # apply morphology close
+
+        closingimage = cv2.morphologyEx(openimage, cv2.MORPH_CLOSE, kernel)
+
+        # To detect object contours, we want a black background and a white object
+
+        inverted_binary = ~closingimage
+
+        # Apply the Component analysis function
+        analysis = cv2.connectedComponentsWithStats(inverted_binary, 4, cv2.CV_32S)
+        (totalLabels, label_ids, values, centroid) = analysis
+
+        # Initialize a new image to store output components
+
+        output = np.zeros(img_to_gray.shape, dtype="uint8")
+
+        # Loop through each component
+        for i in range(1, totalLabels):
+            area = values[i, cv2.CC_STAT_AREA] # tu można dorzucić jakiegoś ifa, który jeśli area coś to nie przepuszcza, ale nie do końca rozumiem czym jest ta area
+
+            componentMask = (label_ids == i).astype("uint8") * 255
+
+        # Creating the Final output mask
+        output = cv2.bitwise_or(output, componentMask)
+
+        # substract
+
+        substract_img = cv2.subtract(inverted_binary, output)
+
+        # Find contours
+
+        contours, hierarchy = cv2.findContours(substract_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+        # Draw contours on original
+
+        with_contours = cv2.drawContours(img_res, contours, -1, (255, 0, 255), 2)
+
+        # Draw a bounding box around contours
+        # x is the starting x coordinate of the bounding box
+        # y is the starting y coordinate of the bounding box
+        # w is the width of the bounding box
+        # h is the height of the bounding box
+
+        for c in contours:
+            x, y, w, h = cv2.boundingRect(c)
+
+            # Make sure contour area is large enough
+            if (cv2.contourArea(c)) > 5:
+                cv2.rectangle(with_contours, (x, y), (x + w, y + h), (255, 0, 0), 1)
+
+
+        #return with_contours
+        cv2.imshow('All contours with bounding box', with_contours)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
