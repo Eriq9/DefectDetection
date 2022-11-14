@@ -1,3 +1,4 @@
+import tkinter
 from tkinter import *
 from PIL import ImageTk, Image
 from tkinter import filedialog
@@ -26,8 +27,10 @@ Label(root, text="Przeanalizowane zdjęcie:",font=("Helvetica", 14)).place(x=950
 Label(root, text="Wykonaj detekcję:",font=("Helvetica", 10)).place(x=20, y=225)                                 #Załaduj losowe zdjęcie
 
 Label(root, text="Parametry analizy:",font=("Helvetica", 10)).place(x=400, y=125)                               #Wybór parametrów
-Label(root, text="Rezultaty:",font=("Helvetica", 10)).place(x=900, y=125)                               #Wyniki
+Label(root, text="Rezultaty:",font=("Helvetica", 10)).place(x=900, y=125)                                       #Wyniki
 
+Label(root, text="Ilość znalezionych defektów:",font=("Helvetica", 10)).place(x=900, y=175)
+Label(root, text="Procent zniszczenia deski:",font=("Helvetica", 10)).place(x=900, y=225)
 
 def open_filename():
     # open file dialog box to select image
@@ -36,12 +39,11 @@ def open_filename():
     return filename
 
 def open_random_photo():
-
+    global random_image
     file_path_type = ["/Users/Eryk/Desktop/deski/2_proba/*.jpg"]
     random_filename = glob.glob(random.choice(file_path_type))
     random_image = random.choice(random_filename)
-    print(random_image)
-
+    print("random image ",random_image)
     return random_image
 
 def load_image():
@@ -75,10 +77,33 @@ def load_random_image():
     panel.place(x=100, y=375)
 
 def Results():
-    algorithm = ImageProcessingAlgorithms(open_random_photo())
+    algorithm = ImageProcessingAlgorithms(random_image)
+    #print("dsdsd ",algorithm.random_image_path)
     Result = algorithm.ImageProcess()
 
-    return Result
+    # zmiana rozmiaru
+    random_img2 = ImageTk.PhotoImage(image=Image.fromarray(Result[0]))
+    print("Main:",Result[1])
+    print("Main:",Result[2])
+
+    DefectCountLabel = Label(root, text=Result[2])
+    DefectCountLabel.place(x=1100, y=175)
+
+    DefectPercentLabel = Label(root, text=Result[1])
+    DefectPercentLabel.place(x=1100, y=225)
+
+
+
+
+    # stworzenie labelki ze zdjęcia
+    panel2 = Label(root, image=random_img2, width=500, height=375)
+    # dodanie do random_img2
+    panel2.image = random_img2
+    panel2.place(x=800, y=375)
+
+    #print("result",Result)
+
+    #return Result
 
 
 # Buttony

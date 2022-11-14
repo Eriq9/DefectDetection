@@ -257,9 +257,11 @@ class ImageProcessingAlgorithms:
         self.random_image_path = ImagePath
 
 
-    def ImageProcess(ImagePath):
+    def ImageProcess(self):
         # Read image
-        img = cv2.imread(ImagePath)
+        #print("!!!!!!!!!!")
+        #print(self.random_image_path)
+        img = cv2.imread(str(self.random_image_path))
         #img = cv2.imread("/Users/Eryk/Desktop/deski/2_proba\DSCF6344.JPG")
 
         # Resize image
@@ -316,6 +318,8 @@ class ImageProcessingAlgorithms:
 
         contours, hierarchy = cv2.findContours(substract_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
+        print('Total number of contours detected: ' + str(len(contours)))
+
         # Draw contours on original
 
         with_contours = cv2.drawContours(img_res, contours, -1, (255, 0, 255), 2)
@@ -329,12 +333,137 @@ class ImageProcessingAlgorithms:
         for c in contours:
             x, y, w, h = cv2.boundingRect(c)
 
+            # area = cv2.contourArea(contours)
+            # print(area)
+
             # Make sure contour area is large enough
             if (cv2.contourArea(c)) > 5:
                 cv2.rectangle(with_contours, (x, y), (x + w, y + h), (255, 0, 0), 1)
 
-
-        #return with_contours
         cv2.imshow('All contours with bounding box', with_contours)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+
+        # Count detects area
+
+        for i in range(len(contours)):
+            area = cv2.contourArea(contours[i])
+
+            # Count detects area, trzeba znaleźć jakoś pole całości i wyliczyć jak procentowo się ma suma do całości
+
+        DefectAreaList = []
+        for i in range(len(contours)):
+            area = cv2.contourArea(contours[i])
+            DefectAreaList.append(area)
+            print("Detects area", area)
+
+        DefectAreaSum = sum(DefectAreaList)
+        DefectCounters = str(len(contours))
+        print("Sum", DefectAreaSum)
+
+
+        return with_contours, DefectAreaSum, DefectCounters
+
+
+
+def ImageProcessLast():
+    # Read image
+
+    img = cv2.imread("/Users/Eryk/Desktop/deski/2_proba\DSCF6344.JPG")
+
+    # Resize image
+
+    img_res = cv2.resize(img, (800, 600))
+
+    # Make a copy
+    new_image = img_res.copy()
+
+    # Convert to grayscale
+
+    img_to_gray = cv2.cvtColor(img_res, cv2.COLOR_BGR2GRAY)
+
+    # Convert to binary
+
+    binary = cv2.adaptiveThreshold(img_to_gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 199, 45)  # adaptive1
+
+    # apply morphology open
+    # defining the kernel matrix
+
+    kernel = np.ones((4, 4), np.uint8)
+    openimage = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+
+    # apply morphology close
+
+    closingimage = cv2.morphologyEx(openimage, cv2.MORPH_CLOSE, kernel)
+
+    # To detect object contours, we want a black background and a white object
+
+    inverted_binary = ~closingimage
+
+    # Apply the Component analysis function
+    analysis = cv2.connectedComponentsWithStats(inverted_binary, 4, cv2.CV_32S)
+    (totalLabels, label_ids, values, centroid) = analysis
+
+    # Initialize a new image to store output components
+
+    output = np.zeros(img_to_gray.shape, dtype="uint8")
+
+    # Loop through each component
+    for i in range(1, totalLabels):
+        area = values[i, cv2.CC_STAT_AREA] # tu można dorzucić jakiegoś ifa, który jeśli area coś to nie przepuszcza, ale nie do końca rozumiem czym jest ta area
+
+        componentMask = (label_ids == i).astype("uint8") * 255
+
+    # Creating the Final output mask
+    output = cv2.bitwise_or(output, componentMask)
+
+    # substract
+
+    substract_img = cv2.subtract(inverted_binary, output)
+
+    # Find contours
+
+    contours, hierarchy = cv2.findContours(substract_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    #print('Total number of contours detected: ' + str(len(contours)))
+
+    # Draw contours on original
+
+    with_contours = cv2.drawContours(img_res, contours, -1, (255, 0, 255), 2)
+
+    # Draw a bounding box around contours
+    # x is the starting x coordinate of the bounding box
+    # y is the starting y coordinate of the bounding box
+    # w is the width of the bounding box
+    # h is the height of the bounding box
+
+    for c in contours:
+        x, y, w, h = cv2.boundingRect(c)
+
+        # Make sure contour area is large enough
+        if (cv2.contourArea(c)) > 5:
+            cv2.rectangle(with_contours, (x, y), (x + w, y + h), (255, 0, 0), 1)
+
+
+
+    # Count detects area, trzeba znaleźć jakoś pole całości i wyliczyć jak procentowo się ma suma do całości
+
+    DefectAreaList = []
+    for i in range(len(contours)):
+        area = cv2.contourArea(contours[i])
+        DefectAreaList.append(area)
+        print("Detects area", area)
+
+    DefectAreaSum = sum(DefectAreaList)
+    print("Sum", DefectAreaSum)
+
+
+
+
+
+    #return with_contours
+    cv2.imshow('All contours with bounding box', with_contours)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+#ImageProcessLast()
