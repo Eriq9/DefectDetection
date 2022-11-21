@@ -434,7 +434,7 @@ class ImageProcessingAlgorithms:
 
         inverted_binary = ~closingimage
 
-        ############################## Znajdowanie konturów #####################################
+        ########################################################## Znajdowanie konturów ##########################################################
 
 
         area_list = []
@@ -521,7 +521,7 @@ class ImageProcessingAlgorithms:
         cv2.destroyAllWindows()
 
 
-        ############################################# Liczenie powierzchni ############################################
+        ############################################# Liczenie powierzchni defektów ############################################
 
         # Count detects area
 
@@ -578,7 +578,11 @@ class ImageProcessingAlgorithms:
             areaCount = values[i, cv2.CC_STAT_AREA]
         print("Full area:", areaCount)
 
-        FailurePercentage = (DefectAreaSum / area) * 100
+        FailurePercentage = (DefectAreaSum / areaCount) * 100
+
+        print("a",DefectAreaSum)
+        print("b",area)
+        print("c",FailurePercentage)
 
         #############################################################################################################################
 

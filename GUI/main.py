@@ -30,7 +30,8 @@ Label(root, text="Parametry analizy:",font=("Helvetica", 10)).place(x=400, y=125
 Label(root, text="Rezultaty:",font=("Helvetica", 10)).place(x=900, y=125)                                       #Wyniki
 
 Label(root, text="Ilość znalezionych defektów:",font=("Helvetica", 10)).place(x=900, y=175)
-Label(root, text="Procent zniszczenia deski:",font=("Helvetica", 10)).place(x=900, y=225)
+Label(root, text="Powierzchnia zniszczonych elementów:",font=("Helvetica", 10)).place(x=900, y=225)
+Label(root, text="Procent zniszczenia deski:",font=("Helvetica", 10)).place(x=900, y=275)
 
 def open_filename():
     # open file dialog box to select image
@@ -41,7 +42,7 @@ def open_filename():
 def open_random_photo():
     global random_image
     #file_path_type = ["/Users/Eryk/Desktop/deski/2_proba/*.jpg"]
-    file_path_type = ["/Users/Eryk/Desktop/deski/3_proba/*.jpg"]
+    file_path_type = ["/Users/Eryk/Desktop/deskinowe/*.jpg"]
     random_filename = glob.glob(random.choice(file_path_type))
     random_image = random.choice(random_filename)
     print("random image ",random_image)
@@ -78,6 +79,19 @@ def load_random_image():
     panel.place(x=100, y=375)
 
 def Results():
+
+
+    DefectCountLabel = Label(root, text="                                                        ")
+    DefectCountLabel.place(x=1150, y=175)
+
+    DefectAreaLabel = Label(root, text="                                                         ")
+    DefectAreaLabel.place(x=1150, y=225)
+
+    DefectPercentLabel = Label(root, text="                                                      ")
+    DefectPercentLabel.place(x=1150, y=275)
+
+
+
     algorithm = ImageProcessingAlgorithms(random_image)
     #print("dsdsd ",algorithm.random_image_path)
     Result = algorithm.ImageProcess()
@@ -88,10 +102,13 @@ def Results():
     print("Main:",Result[2])
 
     DefectCountLabel = Label(root, text=Result[2])
-    DefectCountLabel.place(x=1100, y=175)
+    DefectCountLabel.place(x=1150, y=175)
 
-    DefectPercentLabel = Label(root, text=Result[1])
-    DefectPercentLabel.place(x=1100, y=225)
+    DefectAreaLabel = Label(root, text=Result[1])
+    DefectAreaLabel.place(x=1150, y=225)
+
+    DefectPercentLabel = Label(root, text=Result[3])
+    DefectPercentLabel.place(x=1150, y=275)
 
 
 
