@@ -40,7 +40,8 @@ def open_filename():
 
 def open_random_photo():
     global random_image
-    file_path_type = ["/Users/Eryk/Desktop/deski/2_proba/*.jpg"]
+    #file_path_type = ["/Users/Eryk/Desktop/deski/2_proba/*.jpg"]
+    file_path_type = ["/Users/Eryk/Desktop/deski/3_proba/*.jpg"]
     random_filename = glob.glob(random.choice(file_path_type))
     random_image = random.choice(random_filename)
     print("random image ",random_image)
