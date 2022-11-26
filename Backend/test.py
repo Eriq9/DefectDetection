@@ -137,62 +137,93 @@ from skimage.measure import label, regionprops, regionprops_table
 
 #kMeans()
 
-#
-# def tlo():
-#     # Read in the image
-#     image_source = cv2.imread("/Users/Eryk/Desktop/deskinowe\DSCF6497.JPG")
-#
-#     img_res = cv2.resize(image_source, (800, 600))
-#
-#     # threshold on white
-#     # Define lower and uppper limits
-#     lower = np.array([150, 150, 150])
-#     upper = np.array([255, 255, 255])
-#
-#     # Create mask to only select black
-#     thresh = cv2.inRange(img_res, lower, upper)
-#
-#     cv2.imshow('Gray image', thresh)
-#     cv2.waitKey(0)  # Wait for keypress to continue
-#     cv2.destroyAllWindows()  # Close windows
-#
-#     # apply morphology
-#     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-#     morph = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
-#
-#     cv2.imshow('Gray image', morph)
-#     cv2.waitKey(0)  # Wait for keypress to continue
-#     cv2.destroyAllWindows()  # Close windows
-#
-#     # apply morphology
-#     # Close contour
-#     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
-#     close = cv2.morphologyEx(morph, cv2.MORPH_CLOSE, kernel)
-#
-#     cv2.imshow('Gray image', close)
-#     cv2.waitKey(0)  # Wait for keypress to continue
-#     cv2.destroyAllWindows()  # Close windows
-#
-#     inverted_binary = ~close
-#
-#     # Find outer contour and fill with white
-#     cnts = cv2.findContours(inverted_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-#     cnts = cnts[0] if len(cnts) == 2 else cnts[1]
-#     cv2.fillPoly(inverted_binary, cnts, [255, 255, 255])
-#
-#     cv2.imshow('Gray image', inverted_binary)
-#     cv2.waitKey(0)  # Wait for keypress to continue
-#     cv2.destroyAllWindows()  # Close windows
-#
-#     # Apply the Component analysis function
-#     analysis = cv2.connectedComponentsWithStats(inverted_binary,
-#                                                 4,
-#                                                 cv2.CV_32S)
-#     (totalLabels, label_ids, values, centroid) = analysis
-#
-#     for i in range(1, totalLabels):
-#         area = values[i, cv2.CC_STAT_AREA]
-#         print("area:",area)
+
+def tlo():
+    # Read in the image
+    #image_source = cv2.imread("/Users/Eryk/Desktop/deskinowe\DSCF6497.JPG")
+    #image_source = cv2.imread("/Users/Eryk/Desktop/deskinowe\DSCF6488.JPG")
+    image_source = cv2.imread("/Users/Eryk/Desktop/deskinowe\DSCF6491.JPG")
+    #image_source = cv2.imread("/Users/Eryk/Desktop/deskinowe\DSCF6493.JPG")
+    #image_source = cv2.imread("/Users/Eryk/Desktop/deskinowe\DSCF6494.JPG")
+    #image_source = cv2.imread("/Users/Eryk/Desktop/deskinowe\DSCF6484.JPG")
+
+    img_res = cv2.resize(image_source, (800, 600))
+
+    img_to_gray = cv2.cvtColor(img_res, cv2.COLOR_BGR2GRAY)
+
+    # threshold on white
+    # Define lower and uppper limits
+    lower = np.array([140, 140, 140])
+    upper = np.array([255, 255, 255])
+
+    # Create mask to only select black
+    thresh = cv2.inRange(img_res, lower, upper)
+
+    cv2.imshow('Gray image', thresh)
+    cv2.waitKey(0)  # Wait for keypress to continue
+    cv2.destroyAllWindows()  # Close windows
+
+    # apply morphology
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+    morph = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
+
+    cv2.imshow('Gray image', morph)
+    cv2.waitKey(0)  # Wait for keypress to continue
+    cv2.destroyAllWindows()  # Close windows
+
+    # apply morphology
+    # Close contour
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    close = cv2.morphologyEx(morph, cv2.MORPH_CLOSE, kernel)
+
+    cv2.imshow('Gray image', close)
+    cv2.waitKey(0)  # Wait for keypress to continue
+    cv2.destroyAllWindows()  # Close windows
+
+    inverted_binary = ~close
+
+    # Find outer contour and fill with white
+    cnts = cv2.findContours(inverted_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = cnts[0] if len(cnts) == 2 else cnts[1]
+    cv2.fillPoly(inverted_binary, cnts, [255, 255, 255])
+
+    cv2.imshow('Gray image', inverted_binary)
+    cv2.waitKey(0)  # Wait for keypress to continue
+    cv2.destroyAllWindows()  # Close windows
+
+    # Apply the Component analysis function
+    analysis = cv2.connectedComponentsWithStats(inverted_binary,
+                                                4,
+                                                cv2.CV_32S)
+    (totalLabels, label_ids, values, centroid) = analysis
+
+    # Initialize a new image to store all the output components
+    output = np.zeros(img_to_gray.shape, dtype="uint8")
+
+    for i in range(1, totalLabels):
+        area = values[i, cv2.CC_STAT_AREA]
+
+        if area < 1500:
+            componentMask = (label_ids == i).astype("uint8") * 255
+            output = cv2.bitwise_or(output, componentMask)
+
+
+        print("area:",area)
+
+        # Creating the Final output mask
+
+    cv2.imshow("Filtered Components", output)
+    cv2.waitKey(0)
+
+    # substract
+
+    substract_img = cv2.subtract(inverted_binary, output)
+
+    cv2.imshow("Substract Components", substract_img)
+    cv2.waitKey(0)
+
+    print("centr", centroid)
+    print("number", totalLabels)
 
 
 
@@ -416,7 +447,7 @@ class ImageProcessingAlgorithms:
 
         # Convert to binary
 
-        binary = cv2.adaptiveThreshold(img_to_gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 199, 70)  # adaptive1
+        binary = cv2.adaptiveThreshold(img_to_gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 199, 80)  # średnie wartości sąsiedztwa rozmiar x rozmiar - stała
 
         # apply morphology open
         # defining the kernel matrix
@@ -439,6 +470,7 @@ class ImageProcessingAlgorithms:
 
         area_list = []
         width_list = []
+        height_list = []
         id_list = []
 
         # Apply the Component analysis function
@@ -459,6 +491,7 @@ class ImageProcessingAlgorithms:
             width_list.append(width)
 
             height = values[i, cv2.CC_STAT_HEIGHT]
+            height_list.append(height)
 
             id = i
             id_list.append(id)
@@ -479,11 +512,14 @@ class ImageProcessingAlgorithms:
         # Loop through each component to filter
         for i in range(1, totalLabels):
 
-            if width_list[i - 1] == max_width:
+            if width_list[i - 1] == max_width and width_list[i - 1] > 5 * height_list[max_width_index]:
                 componentMask = (label_ids == max_width_index + 1).astype("uint8") * 255
                 # Creating the Final output mask
                 output = cv2.bitwise_or(output, componentMask)
                 # print(componentMask)
+
+        cv2.imshow("Filtered Components", output)
+        cv2.waitKey(0)
 
 
         # substract
@@ -548,7 +584,7 @@ class ImageProcessingAlgorithms:
 
         # threshold on white
         # Define lower and uppper limits
-        lower = np.array([150, 150, 150])
+        lower = np.array([140, 140, 140])
         upper = np.array([255, 255, 255])
 
         # Create mask
@@ -558,9 +594,8 @@ class ImageProcessingAlgorithms:
         kernelCount = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
         morphCount = cv2.morphologyEx(CountAreaThresh, cv2.MORPH_CLOSE, kernelCount)
 
-        # apply morphology
-        # Close contour
-        kernelCount2 = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
+        # apply morphology close
+        kernelCount2 = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
         closeCount = cv2.morphologyEx(morphCount, cv2.MORPH_CLOSE, kernelCount2)
 
         inverted_binary_count = ~closeCount
@@ -570,19 +605,62 @@ class ImageProcessingAlgorithms:
         cnts = cnts[0] if len(cnts) == 2 else cnts[1]
         cv2.fillPoly(inverted_binary_count, cnts, [255, 255, 255])
 
-        # Apply the Component analysis function
+        # Apply the Component analysis function, zdjęcie na którym jest widoczna tylko deska
+
         analysisCount = cv2.connectedComponentsWithStats(inverted_binary_count, 4, cv2.CV_32S)
         (totalLabels, label_ids, values, centroid) = analysisCount
 
+        AllAreasList = []
+
+        # Initialize a new image to store output components
+
+        outputCount = np.zeros(img_to_gray.shape, dtype="uint8")
+
+
         for i in range(1, totalLabels):
+
             areaCount = values[i, cv2.CC_STAT_AREA]
-        print("Full area:", areaCount)
+            AllAreasList.append(areaCount)
 
-        FailurePercentage = (DefectAreaSum / areaCount) * 100
+            if areaCount < 1500:
+                componentMaskCount = (label_ids == i).astype("uint8") * 255
+                outputCount = cv2.bitwise_or(outputCount, componentMaskCount)
 
-        print("a",DefectAreaSum)
-        print("b",area)
-        print("c",FailurePercentage)
+
+
+        print("Full area list:", AllAreasList)
+
+        cv2.imshow('Area plank', inverted_binary_count)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+        # Creating the Final output mask
+
+        cv2.imshow("Area plank - Filtered Components", outputCount)
+        cv2.waitKey(0)
+
+        # substract
+
+        substract_img_Count = cv2.subtract(inverted_binary_count, outputCount)
+
+        cv2.imshow("Area plank - after substraction", substract_img_Count)
+        cv2.waitKey(0)
+
+        # Apply the Component analysis function 2,analiza wyczyszczonego zdjęcia, tylko sama deska do policzenia powierzchni
+
+        analysisCount2 = cv2.connectedComponentsWithStats(substract_img_Count, 4, cv2.CV_32S)
+        (totalLabels, label_ids, values, centroid) = analysisCount2
+
+        for i in range(1, totalLabels):
+
+            areaCount2 = values[i, cv2.CC_STAT_AREA]
+
+        print("max", max(AllAreasList))
+
+        FailurePercentage = (DefectAreaSum / areaCount2) * 100
+
+        print("Defect area sum: ",DefectAreaSum)
+        print("Percent: ",FailurePercentage)
 
         #############################################################################################################################
 
@@ -878,6 +956,7 @@ def Test():
         print("id " + str(id) + " " + "area: " + str(area) + " " +  "width: " + str(width) + " " + "height: " + str(height))
 
 
+
     max_area = max(area_list)
     max_width = max(width_list)
 
@@ -888,6 +967,10 @@ def Test():
     print(max_area_index)
     print(max_width)
     print(max_width_index)
+
+    print("centr", centroid)
+    print("number", totalLabels)
+
 
     # Loop through each component to filter
     for i in range(1, totalLabels):
@@ -937,3 +1020,4 @@ def Test():
 
 
 #Test()
+#tlo()
