@@ -91,7 +91,6 @@ def Results():
     DefectPercentLabel.place(x=1150, y=275)
 
 
-
     algorithm = ImageProcessingAlgorithms(random_image)
     #print("dsdsd ",algorithm.random_image_path)
     Result = algorithm.ImageProcess()
